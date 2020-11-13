@@ -2,6 +2,8 @@ from collections import defaultdict
 
 from mesa.time import RandomActivation
 
+LOW_VISION_THRESHOLD = 3
+
 
 class RandomActivationByBreed(RandomActivation):
     """
@@ -39,7 +41,7 @@ class RandomActivationByBreed(RandomActivation):
         """
 
         self.num_dead += 1
-        if agent.vision <= 3:
+        if agent.vision < LOW_VISION_THRESHOLD:
             self.num_low_vision_dead += 1
         else:
             self.num_high_vision_dead += 1

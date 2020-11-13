@@ -32,21 +32,37 @@ class Ant(Agent):
             if type(agent) is Sugar:
                 return agent
 
-    def move(self):
-        # Get neighborhood within vision
-        neighbors = [
+    def move_with_shared_knowledge(self):
+        neighbors = self.unoccupied_neighbors()
+        if not neighbors:
+            candidates = []
+        else:
+            candidates = self.max_sugar_candidates(neighbors)
+        new_pos = self.model.shared_knowledge.in_direction_to_closest_max(self.pos, candidates)
+        print("new pos", new_pos)
+        sugar_at_new_pos = self.get_sugar(new_pos).amount
+        self.model.shared_knowledge.publish_value(new_pos, sugar_at_new_pos)
+        self.model.grid.move_agent(self, new_pos)
+
+    def unoccupied_neighbors(self):
+        return [
             i
             for i in self.model.grid.get_neighborhood(
                 self.pos, self.moore, False, radius=self.vision
             )
             if not self.model.is_occupied(i)
         ]
-        neighbors.append(self.pos)
-        # Look for location with the most sugar
-        max_sugar = max([self.get_sugar(pos).amount for pos in neighbors])
-        candidates = [
-            pos for pos in neighbors if self.get_sugar(pos).amount == max_sugar
+
+    def max_sugar_candidates(self, possible_pos):
+        max_sugar = max([self.get_sugar(pos).amount for pos in possible_pos])
+        return [
+            pos for pos in possible_pos if self.get_sugar(pos).amount == max_sugar
         ]
+
+    def move(self):
+        neighbors = self.unoccupied_neighbors()
+        neighbors.append(self.pos)
+        candidates = self.max_sugar_candidates(neighbors)
         # Narrow down to the nearest ones
         min_dist = min([get_distance(self.pos, pos) for pos in candidates])
         final_candidates = [
@@ -61,7 +77,10 @@ class Ant(Agent):
         sugar_patch.amount = 0
 
     def step(self):
-        self.move()
+        if self.model.shared_knowledge:
+            self.move_with_shared_knowledge()
+        else:
+            self.move()
         self.eat()
         if self.sugar <= 0:
             self.model.grid._remove_agent(self.pos, self)

@@ -21,13 +21,15 @@ def ant_portrayal(agent):
     portrayal = {}
 
     if type(agent) is Ant:
-        portrayal["Color"] = f"#{float2hex(agent.sugar/100.0)}00{float2hex(agent.vision/6.0)}"
+        rel_vis = agent.vision/6.0
+        rel_sugar = agent.sugar/100.0
+        portrayal["Color"] = f"#{float2hex(rel_sugar)}00{float2hex(rel_vis)}"
         portrayal["Shape"] = "rect"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 1
         portrayal["w"] = 1
         portrayal["h"] = 1
-        portrayal["tooltip"] = f"{agent.vision}/{agent.sugar}/{agent.metabolism}"
+        portrayal["sugar/meta/vis"] = f"{agent.sugar}/{agent.metabolism}/{agent.vision}"
 
     elif type(agent) is Sugar:
         portrayal["Color"] = color_dic[agent.amount]
@@ -52,6 +54,7 @@ vision_chart_element = ChartModule([
 
 model_params = {
     "initial_population": UserSettableParameter("slider", "Initial Population", 100, 1, 2000, 1),
+    "share_knowledge": UserSettableParameter("checkbox", "Share Knowledge", False),
 }
 
 server = ModularServer(

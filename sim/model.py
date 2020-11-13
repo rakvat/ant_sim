@@ -16,6 +16,7 @@ from mesa.datacollection import DataCollector
 
 from .agents import Ant, Sugar
 from .schedule import RandomActivationByBreed
+from .shared_knowledge import SharedKnowledge
 
 
 class SugarscapeCg(Model):
@@ -30,7 +31,7 @@ class SugarscapeCg(Model):
 
     verbose = True  # Print-monitoring
 
-    def __init__(self, height=50, width=50, initial_population=100):
+    def __init__(self, height=50, width=50, initial_population=100, share_knowledge=False):
         """
         Create a new Constant Growback model with the given parameters.
 
@@ -44,6 +45,7 @@ class SugarscapeCg(Model):
         self.initial_population = initial_population
 
         self.schedule = RandomActivationByBreed(self)
+        self.shared_knowledge = SharedKnowledge(width=width, height=height) if share_knowledge else None
         self.grid = MultiGrid(self.height, self.width, torus=False)
         self.datacollector = DataCollector({
             self.LIVING_ANTS: lambda m: m.schedule.get_breed_count(Ant),
@@ -64,7 +66,7 @@ class SugarscapeCg(Model):
         for i in range(self.initial_population):
             sugar = self.random.randrange(6, 25)
             metabolism = self.random.randrange(2, 4)
-            vision = self.random.randrange(1, 6)
+            vision = self.random.randrange(1, 5)
             while self.is_occupied(pos:=(
                 self.random.randrange(self.width),
                 self.random.randrange(self.height)
