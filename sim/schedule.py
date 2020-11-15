@@ -1,6 +1,9 @@
+from typing import Optional
 from collections import defaultdict
 
 from mesa.time import RandomActivation
+
+from .agents import Ant
 
 LOW_VISION_THRESHOLD = 3
 
@@ -85,15 +88,16 @@ class RandomActivationByBreed(RandomActivation):
         """
         return len(self.agents_by_breed[breed_class].values())
 
-    def percent_dead(self, low_vision: bool) -> float:
+    def percent_dead(self, filter: Optional[str]=None) -> float:
         if self.num_dead == 0:
             return 0
 
-        value = self.num_low_vision_dead
-        if not low_vision:
-            value = self.num_high_vision_dead
-
-        return value/self.num_dead
-
-
-
+        if filter:
+            value = 0
+            if filter == self.model.PERCENT_DEAD_LOW_VISION:
+                value = self.num_low_vision_dead
+            elif filter == self.model.PERCENT_DEAD_HIGH_VISION:
+                value = self.num_high_vision_dead
+            return value/self.num_dead
+        else:
+            self.num_dead/(self.num_dead + self.get_breed_count(Ant))

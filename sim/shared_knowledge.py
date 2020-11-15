@@ -14,8 +14,6 @@ class SharedKnowledge:
     def __init__(self, width: int, height: int):
         self.width = width
         self.height = height
-        print("width", width)
-        print("height", height)
 
         for i in range(0, width):
             for j in range(0, height):
@@ -45,19 +43,16 @@ class SharedKnowledge:
 
         return min_dist_pos
 
-    def in_direction_to_closest_max(self, pos: POS, unoccupied_pos: List[POS]) -> POS:
-        print("current", pos)
-        closest = self.closest_max(pos)
+    def in_direction_to_closest_max(self, current_pos: POS, candidates: List[POS]) -> POS:
+        closest = self.closest_max(current_pos)
 
-        min_pos = pos
+        min_pos = current_pos
         min_dist = sys.maxsize
-        random.shuffle(unoccupied_pos)
-        for u_pos in unoccupied_pos:
+        random.shuffle(candidates)
+        for u_pos in candidates:
             dist = self.distance(u_pos, closest)
             if dist < min_dist:
                 min_dist = dist
                 min_pos = u_pos
 
-        print("closest", closest)
-        print("min pos", min_pos)
         return min_pos

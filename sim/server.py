@@ -29,7 +29,7 @@ def ant_portrayal(agent):
         portrayal["Layer"] = 1
         portrayal["w"] = 1
         portrayal["h"] = 1
-        portrayal["sugar/meta/vis"] = f"{agent.sugar}/{agent.metabolism}/{agent.vision}"
+        portrayal["id/sugar/meta/vis"] = f"{agent.id}/{agent.sugar}/{agent.metabolism}/{agent.vision}"
 
     elif type(agent) is Sugar:
         portrayal["Color"] = color_dic[agent.amount]

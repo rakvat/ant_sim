@@ -50,8 +50,8 @@ class SugarscapeCg(Model):
         self.datacollector = DataCollector({
             self.LIVING_ANTS: lambda m: m.schedule.get_breed_count(Ant),
             self.DEAD_ANTS: lambda m: m.schedule.num_dead,
-            self.PERCENT_DEAD_LOW_VISION: lambda m: m.schedule.percent_dead(low_vision=True),
-            self.PERCENT_DEAD_HIGH_VISION: lambda m: m.schedule.percent_dead(low_vision=False),
+            self.PERCENT_DEAD_LOW_VISION: lambda m: m.schedule.percent_dead(filter=self.PERCENT_DEAD_LOW_VISION),
+            self.PERCENT_DEAD_HIGH_VISION: lambda m: m.schedule.percent_dead(filter=self.PERCENT_DEAD_HIGH_VISION),
         })
 
         # Create sugar
@@ -73,7 +73,7 @@ class SugarscapeCg(Model):
             )):
                 pass
 
-            ant = Ant(pos, self, False, sugar, metabolism, vision)
+            ant = Ant(i, pos, self, False, sugar, metabolism, vision)
             self.grid.place_agent(ant, pos)
             self.schedule.add(ant)
 
@@ -89,7 +89,12 @@ class SugarscapeCg(Model):
         # collect data
         self.datacollector.collect(self)
         if self.verbose:
-            print([self.schedule.time, self.schedule.get_breed_count(Ant)])
+            print({
+                'time': self.schedule.time,
+                '% dead ': self.schedule.percent_dead(),
+                '% dead high vision': self.schedule.percent_dead(filter=self.PERCENT_DEAD_HIGH_VISION),
+                '% dead low vision': self.schedule.percent_dead(filter=self.PERCENT_DEAD_LOW_VISION),
+            })
 
     def run_model(self, step_count=200):
 
