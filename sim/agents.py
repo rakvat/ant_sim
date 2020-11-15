@@ -18,9 +18,12 @@ def get_distance(pos_1, pos_2):
 
 
 class Ant(Agent):
-    def __init__(self, id, pos, model, moore=False, sugar=0, metabolism=0, vision=0):
+    counter:int = 0
+
+    def __init__(self, pos, model, moore=False, sugar=0, metabolism=0, vision=0):
         super().__init__(pos, model)
-        self.id = id
+        self.id = self.counter
+        self.counter += 1
         self.pos = pos
         self.moore = moore
         self.sugar = sugar

@@ -31,7 +31,7 @@ class SugarscapeCg(Model):
 
     verbose = True  # Print-monitoring
 
-    def __init__(self, height=50, width=50, initial_population=100, share_knowledge=False):
+    def __init__(self, height=50, width=50, initial_population=100, recreate=0, share_knowledge=False, solidarity=False):
         """
         Create a new Constant Growback model with the given parameters.
 
@@ -43,9 +43,11 @@ class SugarscapeCg(Model):
         self.height = height
         self.width = width
         self.initial_population = initial_population
+        self.recreate = recreate
 
         self.schedule = RandomActivationByBreed(self)
         self.shared_knowledge = SharedKnowledge(width=width, height=height) if share_knowledge else None
+        self.solidarity = self.shared_knowledge and solidarity
         self.grid = MultiGrid(self.height, self.width, torus=False)
         self.datacollector = DataCollector({
             self.LIVING_ANTS: lambda m: m.schedule.get_breed_count(Ant),
@@ -64,21 +66,24 @@ class SugarscapeCg(Model):
 
         # Create ants:
         for i in range(self.initial_population):
-            sugar = self.random.randrange(6, 25)
-            metabolism = self.random.randrange(2, 4)
-            vision = self.random.randrange(1, 5)
-            while self.is_occupied(pos:=(
-                self.random.randrange(self.width),
-                self.random.randrange(self.height)
-            )):
-                pass
-
-            ant = Ant(i, pos, self, False, sugar, metabolism, vision)
-            self.grid.place_agent(ant, pos)
-            self.schedule.add(ant)
+            self._create_ant()
 
         self.running = True
         self.datacollector.collect(self)
+
+    def _create_ant(self):
+        sugar = self.random.randrange(6, 25)
+        metabolism = self.random.randrange(2, 4)
+        vision = self.random.randrange(1, 5)
+        while self.is_occupied(pos:=(
+            self.random.randrange(self.width),
+            self.random.randrange(self.height)
+        )):
+            pass
+
+        ant = Ant(pos, self, False, sugar, metabolism, vision)
+        self.grid.place_agent(ant, pos)
+        self.schedule.add(ant)
 
     def is_occupied(self, pos):
         this_cell = self.grid.get_cell_list_contents([pos])
@@ -88,6 +93,10 @@ class SugarscapeCg(Model):
         self.schedule.step()
         # collect data
         self.datacollector.collect(self)
+        if self.recreate and self.schedule.time % 10 == 0:
+            for _i in range(0, self.recreate):
+                self._create_ant()
+
         if self.verbose:
             print({
                 'time': self.schedule.time,
