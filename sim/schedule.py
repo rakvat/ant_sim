@@ -100,4 +100,4 @@ class RandomActivationByBreed(RandomActivation):
                 value = self.num_high_vision_dead
             return value/self.num_dead
         else:
-            self.num_dead/(self.num_dead + self.get_breed_count(Ant))
+            return self.num_dead/(self.num_dead + self.get_breed_count(Ant))

@@ -26,25 +26,38 @@ class SharedKnowledge:
     def distance(self, pos_a: POS, pos_b: POS) -> float:
         return self.distance_map[(abs(pos_a[0]-pos_b[0]), abs(pos_a[1]-pos_b[1]))]
 
+    def closest_min(self, pos: POS) -> POS:
+        pos_with_min: List[POS] = [
+            pos for pos, value in self.max_sugar_map.items() if value == 0
+        ]
+        if not pos_with_min:
+            return pos
+        return self._closest(pos, pos_with_min)
+
+    def _closest(self, pos:POS, candidates: List[POS]) -> POS:
+        min_dist = sys.maxsize
+        random.shuffle(candidates)
+        min_dist_pos = candidates[0]
+        for max_pos in candidates:
+            dist = self.distance(pos, max_pos)
+            if dist < min_dist:
+                min_dist_pos = max_pos
+                min_dist = dist
+        return min_dist_pos
+
     def closest_max(self, pos: POS) -> POS:
         pos_with_max: List[POS] = [
             pos for pos, value in self.max_sugar_map.items() if value >= self.current_max
         ]
         if not pos_with_max:
             return pos
-        min_dist = sys.maxsize
-        random.shuffle(pos_with_max)
-        min_dist_pos = pos_with_max[0]
-        for max_pos in pos_with_max:
-            dist = self.distance(pos, max_pos)
-            if dist < min_dist:
-                min_dist_pos = max_pos
-                min_dist = dist
+        return self._closest(pos, pos_with_max)
 
-        return min_dist_pos
-
-    def in_direction_to_closest_max(self, current_pos: POS, candidates: List[POS]) -> POS:
-        closest = self.closest_max(current_pos)
+    def in_direction_to_closest(self, current_pos: POS, candidates: List[POS], search_max: bool = True) -> POS:
+        if search_max:
+            closest = self.closest_max(current_pos)
+        else:
+            closest = self.closest_min(current_pos)
 
         min_pos = current_pos
         min_dist = sys.maxsize
