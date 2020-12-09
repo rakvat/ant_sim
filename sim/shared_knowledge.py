@@ -9,6 +9,7 @@ POS = Tuple[int, int]
 class SharedKnowledge:
     distance_map: Dict[POS, float] = {}
     max_sugar_map: Dict[POS, int] = {}
+    recent_sugar_map: Dict[POS, int] = {}
     current_max = 0
 
     def __init__(self, width: int, height: int):
@@ -22,6 +23,12 @@ class SharedKnowledge:
     def publish_value(self, pos: POS, value: int) -> None:
         self.current_max = max(value, self.current_max)
         self.max_sugar_map[pos] = max(value, self.max_sugar_map.get(pos, 0))
+        self.recent_sugar_map[pos] = round(self.recent_sugar_map.get(pos, 0) * 0.5 + 0.5 * value)
+
+    def recent_max(self) -> int:
+        if not self.recent_sugar_map:
+            return 0
+        return max(self.recent_sugar_map.values())
 
     def distance(self, pos_a: POS, pos_b: POS) -> float:
         return self.distance_map[(abs(pos_a[0]-pos_b[0]), abs(pos_a[1]-pos_b[1]))]
@@ -46,8 +53,10 @@ class SharedKnowledge:
         return min_dist_pos
 
     def closest_max(self, pos: POS) -> POS:
+        recent_max = self.recent_max()
         pos_with_max: List[POS] = [
-            pos for pos, value in self.max_sugar_map.items() if value >= self.current_max
+            # pos for pos, value in self.max_sugar_map.items() if value >= self.current_max
+            pos for pos, value in self.recent_sugar_map.items() if value >= recent_max
         ]
         if not pos_with_max:
             return pos

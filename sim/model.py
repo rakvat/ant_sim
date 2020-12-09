@@ -29,7 +29,7 @@ class SugarscapeCg(Model):
     PERCENT_DEAD_LOW_VISION = "% Dead Low Vision"
     PERCENT_DEAD_HIGH_VISION = "% Dead High Vision"
 
-    verbose = True  # Print-monitoring
+    verbose = False  # Print-monitoring
 
     def __init__(self, height=50, width=50, initial_population=100, recreate=0, share_knowledge=False, solidarity=False):
         """
@@ -50,10 +50,18 @@ class SugarscapeCg(Model):
         self.solidarity = self.shared_knowledge and solidarity
         self.grid = MultiGrid(self.height, self.width, torus=False)
         self.datacollector = DataCollector({
+            "initial_population": lambda m: m.initial_population,
+            "shared_knowledge": lambda m: m.shared_knowledge is not None,
+            "recreate": lambda m: m.recreate,
+            "solidarity": lambda m: m.solidarity,
             self.LIVING_ANTS: lambda m: m.schedule.get_breed_count(Ant),
             self.DEAD_ANTS: lambda m: m.schedule.num_dead,
             self.PERCENT_DEAD_LOW_VISION: lambda m: m.schedule.percent_dead(filter=self.PERCENT_DEAD_LOW_VISION),
             self.PERCENT_DEAD_HIGH_VISION: lambda m: m.schedule.percent_dead(filter=self.PERCENT_DEAD_HIGH_VISION),
+            "min_sugar": lambda m: m.schedule.min_sugar(),
+            "max_sugar": lambda m: m.schedule.max_sugar(),
+            "avg_sugar": lambda m: m.schedule.avg_sugar(),
+            "stdev_sugar": lambda m: m.schedule.stdev_sugar(),
         })
 
         # Create sugar
@@ -91,8 +99,10 @@ class SugarscapeCg(Model):
 
     def step(self):
         self.schedule.step()
+
         # collect data
         self.datacollector.collect(self)
+
         if self.recreate and self.schedule.time % 10 == 0:
             for _i in range(0, self.recreate):
                 self._create_ant()

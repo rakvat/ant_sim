@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Optional, List
+from statistics import mean, stdev
 from collections import defaultdict
 
 from mesa.time import RandomActivation
@@ -86,9 +87,24 @@ class RandomActivationByBreed(RandomActivation):
         """
         Returns the current number of agents of certain breed in the queue.
         """
-        return len(self.agents_by_breed[breed_class].values())
+        return len(self.agents_by_breed[breed_class])
 
-    def percent_dead(self, filter: Optional[str]=None) -> float:
+    def get_ants(self) -> List[Ant]:
+        return self.agents_by_breed[Ant].values()
+
+    def min_sugar(self) -> float:
+        return min(a.sugar for a in self.get_ants())
+
+    def max_sugar(self) -> float:
+        return max(a.sugar for a in self.get_ants())
+
+    def avg_sugar(self) -> float:
+        return mean(a.sugar for a in self.get_ants())
+
+    def stdev_sugar(self) -> float:
+        return stdev(a.sugar for a in self.get_ants())
+
+    def percent_dead(self, filter: Optional[str] = None) -> float:
         if self.num_dead == 0:
             return 0
 
