@@ -12,7 +12,7 @@ Sugar needs to regrow. Ants have varied vision and can only walk up to x fields 
 
 In the basic version of the example, the ants just check the area within their vision to decide on their next move.
 
-In the knowledge version the ants collectively build a shared knowledge map of the territory storing recent sugar availability. Sharing knowledge leads to better chance of surviving.
+In the knowledge version the ants collectively build a shared knowledge map of the territory storing recent sugar availability. Sharing knowledge leads to a better chance of surviving.
 
 ## How to Run
 
@@ -28,17 +28,21 @@ Run the batch processing which produces `ants.csv` (this will run for some hours
 
 `python batch.py`
 
-Run the Jupyter notebook that analysis `ants.csv`:
+Run the Jupyter notebook that analyzes `ants.csv`:
 
 `jupyter notebook`
 
 
 ## Data-Analysis and Findings
 
-See the included Jupyter notebook.
+See the included [Jupyter notebook](https://github.com/rakvat/ant_sim/blob/master/Ants%20with%20Knowledge%20and%20Solidarity.ipynb).
 
 ## Videos
 
+Basic mode:
+
 [![Example simulation run with basic mode](https://img.youtube.com/vi/DuyHtU5Atd0/0.jpg)](https://youtu.be/DuyHtU5Atd0)
+
+Knowledge mode:
 
 [![Example simulation run with knowledge mode](https://img.youtube.com/vi/oh7xUkg7cEE/0.jpg)](https://youtu.be/oh7xUkg7cEE)
