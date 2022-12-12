@@ -31,7 +31,7 @@ class SugarscapeCg(Model):
 
     verbose = False  # Print-monitoring
 
-    def __init__(self, height=50, width=50, initial_population=100, recreate=0, share_knowledge=False, solidarity=False):
+    def __init__(self, height=50, width=50, initial_population=100, recreate=0, shared_knowledge=False, solidarity=False):
         """
         Create a new Constant Growback model with the given parameters.
 
@@ -46,7 +46,7 @@ class SugarscapeCg(Model):
         self.recreate = recreate
 
         self.schedule = RandomActivationByBreed(self)
-        self.shared_knowledge = SharedKnowledge(width=width, height=height) if share_knowledge else None
+        self.shared_knowledge = SharedKnowledge(width=width, height=height) if shared_knowledge else None
         self.solidarity = self.shared_knowledge and solidarity
         self.grid = MultiGrid(self.height, self.width, torus=False)
         self.datacollector = DataCollector({

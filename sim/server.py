@@ -1,6 +1,6 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
-from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.UserParam import Checkbox, Slider
 
 
 from .agents import Ant, Sugar
@@ -53,10 +53,10 @@ vision_chart_element = ChartModule([
 ])
 
 model_params = {
-    "initial_population": UserSettableParameter("slider", "Initial Population", 100, 1, 2000, 1),
-    "recreate": UserSettableParameter("slider", "Recreate ants every 10 steps", 0, 0, 10, 1),
-    "share_knowledge": UserSettableParameter("checkbox", "Share Knowledge", False),
-    "solidarity": UserSettableParameter("checkbox", "Solidarity (only with shared knowledge)", False),
+    "initial_population": Slider("Initial Population", 100, 1, 2000, 1),
+    "recreate": Slider("Recreate ants every 10 steps", 0, 0, 10, 1),
+    "shared_knowledge": Checkbox("Shared Knowledge", False),
+    "solidarity": Checkbox("Solidarity (only with shared knowledge)", False),
 }
 
 server = ModularServer(

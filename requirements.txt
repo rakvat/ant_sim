@@ -1,5 +1,4 @@
 mesa
-pathos
 jupyter
 numpy
 matplotlib
