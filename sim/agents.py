@@ -19,10 +19,10 @@ def get_distance(pos_1, pos_2):
 
 class Ant(Agent):
     counter: int = 0
-    UPPER_LIMIT = 100
-    LOWER_LIMIT = 50
+    SUGER_UPPER_LIMIT = 100
+    SUGAR_LOWER_LIMIT = 50
 
-    def __init__(self, pos, model, moore=False, sugar=0, metabolism=0, vision=0):
+    def __init__(self, pos, model, moore=False, sugar=0, metabolism=0, senses=0, individualist=False):
         super().__init__(pos, model)
         self.id = Ant.counter
         Ant.counter += 1
@@ -30,7 +30,8 @@ class Ant(Agent):
         self.moore = moore
         self.sugar = sugar
         self.metabolism = metabolism
-        self.vision = vision
+        self.senses = senses
+        self.individualist = individualist
 
     def get_sugar(self, pos):
         this_cell = self.model.grid.get_cell_list_contents([pos])
@@ -38,47 +39,9 @@ class Ant(Agent):
             if type(agent) is Sugar:
                 return agent
 
-    def move_with_shared_knowledge(self):
-        neighbors = self.unoccupied_neighbors()
-        search_max = not (self.model.solidarity and self._gives_space())
-        candidates = []
-        if neighbors:
-            candidates = self.sugar_candidates(neighbors, search_max=search_max)
-
-        new_pos = self.model.shared_knowledge.in_direction_to_closest(
-            current_pos=self.pos,
-            candidates=candidates,
-            search_max=search_max,
-        )
-        sugar_at_new_pos = self.get_sugar(new_pos).amount
-        self.model.shared_knowledge.publish_value(new_pos, sugar_at_new_pos)
-        self.model.grid.move_agent(self, new_pos)
-
-    def _gives_space(self) -> bool:
-        if self.sugar > self.UPPER_LIMIT:
-            self.is_giving_space = True
-        elif self.sugar < self.LOWER_LIMIT:
-            self.is_giving_space = False
-        return self.is_giving_space
-
-    def unoccupied_neighbors(self):
-        return [
-            i
-            for i in self.model.grid.get_neighborhood(
-                self.pos, self.moore, False, radius=self.vision
-            )
-            if not self.model.is_occupied(i)
-        ]
-
-    def sugar_candidates(self, possible_pos, search_max:bool = True):
-        ops = max if search_max else min
-        search_value = ops([self.get_sugar(pos).amount for pos in possible_pos])
-        return [pos for pos in possible_pos if self.get_sugar(pos).amount == search_value]
-
     def move(self):
         neighbors = self.unoccupied_neighbors()
-        neighbors.append(self.pos)
-        candidates = self.sugar_candidates(neighbors)
+        candidates = self.sugar_candidates(neighbors or [self.pos])
         # Narrow down to the nearest ones
         min_dist = min([get_distance(self.pos, pos) for pos in candidates])
         final_candidates = [
@@ -87,17 +50,57 @@ class Ant(Agent):
         self.random.shuffle(final_candidates)
         self.model.grid.move_agent(self, final_candidates[0])
 
-    def eat(self):
+    def move_with_shared_knowledge(self):
+        neighbors = self.unoccupied_neighbors()
+        candidates = self.sugar_candidates(neighbors or [self.pos])
+
+        new_pos = self.model.shared_knowledge.in_direction_to_closest(
+            current_pos=self.pos,
+            candidates=candidates,
+        )
+        sugar_at_new_pos = self.get_sugar(new_pos).amount
+        self.model.shared_knowledge.publish_value(new_pos, sugar_at_new_pos)
+        self.model.grid.move_agent(self, new_pos)
+
+    def unoccupied_neighbors(self):
+        return [
+            i
+            for i in self.model.grid.get_neighborhood(
+                self.pos, self.moore, False, radius=self.senses
+            )
+            if not self.model.is_occupied(i)
+        ]
+
+    def sugar_candidates(self, possible_pos):
+        max_value = max([self.get_sugar(pos).amount for pos in possible_pos])
+        return [pos for pos in possible_pos if self.get_sugar(pos).amount == max_value]
+
+    def collect(self) -> int:
         sugar_patch = self.get_sugar(self.pos)
-        self.sugar = self.sugar - self.metabolism + sugar_patch.amount
+        assert sugar_patch
+        collected = sugar_patch.amount
         sugar_patch.amount = 0
+        return collected
+
+    def eat(self, amount: int) -> None:
+        self.sugar = self.sugar - self.metabolism + amount
 
     def step(self):
         if self.model.shared_knowledge:
             self.move_with_shared_knowledge()
         else:
             self.move()
-        self.eat()
+        collected = self.collect()
+        if self.model.solidarity and not self.individualist:
+            needed = self.metabolism
+            to_distribute = max(0, collected - needed) if self.sugar > 3 * self.metabolism else 0
+            to_eat = collected - to_distribute
+            if to_eat < needed:
+                to_eat += self.model.distribution.require(needed-to_eat)
+            self.model.distribution.add(to_distribute)
+            self.eat(to_eat)
+        else:
+            self.eat(collected)
         if self.sugar <= 0:
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)

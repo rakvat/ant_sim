@@ -6,7 +6,7 @@ from mesa.time import RandomActivation
 
 from .agents import Ant
 
-LOW_VISION_THRESHOLD = 3
+LOW_SENSES_THRESHOLD = 3
 
 
 class RandomActivationByBreed(RandomActivation):
@@ -24,8 +24,9 @@ class RandomActivationByBreed(RandomActivation):
         super().__init__(model)
         self.agents_by_breed = defaultdict(dict)
         self.num_dead = 0
-        self.num_low_vision_dead = 0
-        self.num_high_vision_dead = 0
+        self.num_low_senses_dead = 0
+        self.num_high_senses_dead = 0
+        self.num_individualists_dead = 0
 
     def add(self, agent):
         """
@@ -45,10 +46,12 @@ class RandomActivationByBreed(RandomActivation):
         """
 
         self.num_dead += 1
-        if agent.vision < LOW_VISION_THRESHOLD:
-            self.num_low_vision_dead += 1
+        if agent.senses < LOW_SENSES_THRESHOLD:
+            self.num_low_senses_dead += 1
         else:
-            self.num_high_vision_dead += 1
+            self.num_high_senses_dead += 1
+        if agent.individualist:
+            self.num_individualists_dead += 1
 
         del self._agents[agent.unique_id]
 
@@ -110,10 +113,12 @@ class RandomActivationByBreed(RandomActivation):
 
         if filter:
             value = 0
-            if filter == self.model.PERCENT_DEAD_LOW_VISION:
-                value = self.num_low_vision_dead
-            elif filter == self.model.PERCENT_DEAD_HIGH_VISION:
-                value = self.num_high_vision_dead
+            if filter == self.model.PERCENT_DEAD_LOW_SENSES:
+                value = self.num_low_senses_dead
+            elif filter == self.model.PERCENT_DEAD_HIGH_SENSES:
+                value = self.num_high_senses_dead
+            elif filter == self.model.PERCENT_DEAD_INDIVIDUALISTS:
+                value = self.num_individualists_dead
             return value/self.num_dead
         else:
             return self.num_dead/(self.num_dead + self.get_breed_count(Ant))

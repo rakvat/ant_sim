@@ -21,15 +21,15 @@ def ant_portrayal(agent):
     portrayal = {}
 
     if type(agent) is Ant:
-        rel_vis = agent.vision/6.0
+        rel_vis = agent.senses/6.0
         rel_sugar = agent.sugar/100.0
-        portrayal["Color"] = f"#{float2hex(rel_sugar)}00{float2hex(rel_vis)}"
+        portrayal["Color"] = f"#FFFF00" if agent.individualist else f"#{float2hex(rel_sugar)}00{float2hex(rel_vis)}"
         portrayal["Shape"] = "rect"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 1
         portrayal["w"] = 1
         portrayal["h"] = 1
-        portrayal["id/sugar/meta/vis"] = f"{agent.id}/{agent.sugar}/{agent.metabolism}/{agent.vision}"
+        portrayal["id/sugar/meta/vis"] = f"{agent.id}/{agent.sugar}/{agent.metabolism}/{agent.senses}"
 
     elif type(agent) is Sugar:
         portrayal["Color"] = color_dic[agent.amount]
@@ -47,18 +47,20 @@ alive_chart_element = ChartModule([
     {"Label": SugarscapeCg.LIVING_ANTS, "Color": "#00AA00"},
     {"Label": SugarscapeCg.DEAD_ANTS, "Color": "#AA0000"}
 ])
-vision_chart_element = ChartModule([
-    {"Label": SugarscapeCg.PERCENT_DEAD_LOW_VISION, "Color": "#000000"},
-    {"Label": SugarscapeCg.PERCENT_DEAD_HIGH_VISION, "Color": "#0000FF"}
+senses_chart_element = ChartModule([
+    {"Label": SugarscapeCg.PERCENT_DEAD_LOW_SENSES, "Color": "#000000"},
+    {"Label": SugarscapeCg.PERCENT_DEAD_HIGH_SENSES, "Color": "#0000FF"},
+    {"Label": SugarscapeCg.PERCENT_DEAD_INDIVIDUALISTS, "Color": "#FFFF00"},
 ])
 
 model_params = {
-    "initial_population": Slider("Initial Population", 100, 1, 2000, 1),
-    "recreate": Slider("Recreate ants every 10 steps", 0, 0, 10, 1),
+    "initial_population": Slider("Initial Population", value=100, min_value=2, max_value=2000, step=1),
+    "recreate": Slider("Recreate ants every 10 steps", value=0, min_value=0, max_value=10, step=1),
     "shared_knowledge": Checkbox("Shared Knowledge", False),
-    "solidarity": Checkbox("Solidarity (only with shared knowledge)", False),
+    "solidarity": Checkbox("Solidarity", False),
+    "individualist_percent": Slider("Percent individualists", value=0, min_value=0, max_value=100, step=1, description="only with solidarity"),
 }
 
 server = ModularServer(
-    SugarscapeCg, [canvas_element, alive_chart_element, vision_chart_element], "Ants", model_params
+    SugarscapeCg, [canvas_element, alive_chart_element, senses_chart_element], "Ants", model_params
 )

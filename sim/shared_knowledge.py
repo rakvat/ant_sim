@@ -1,4 +1,5 @@
 import sys
+import math
 import random
 from typing import Dict, Tuple, List
 
@@ -18,7 +19,7 @@ class SharedKnowledge:
 
         for i in range(0, width):
             for j in range(0, height):
-                self.distance_map[(i, j)] = (i**2+j**2)/2
+                self.distance_map[(i, j)] = math.sqrt(i**2+j**2)
 
     def publish_value(self, pos: POS, value: int) -> None:
         self.current_max = max(value, self.current_max)
@@ -32,14 +33,6 @@ class SharedKnowledge:
 
     def distance(self, pos_a: POS, pos_b: POS) -> float:
         return self.distance_map[(abs(pos_a[0]-pos_b[0]), abs(pos_a[1]-pos_b[1]))]
-
-    def closest_min(self, pos: POS) -> POS:
-        pos_with_min: List[POS] = [
-            pos for pos, value in self.max_sugar_map.items() if value == 0
-        ]
-        if not pos_with_min:
-            return pos
-        return self._closest(pos, pos_with_min)
 
     def _closest(self, pos:POS, candidates: List[POS]) -> POS:
         min_dist = sys.maxsize
@@ -62,11 +55,8 @@ class SharedKnowledge:
             return pos
         return self._closest(pos, pos_with_max)
 
-    def in_direction_to_closest(self, current_pos: POS, candidates: List[POS], search_max: bool = True) -> POS:
-        if search_max:
-            closest = self.closest_max(current_pos)
-        else:
-            closest = self.closest_min(current_pos)
+    def in_direction_to_closest(self, current_pos: POS, candidates: List[POS]) -> POS:
+        closest = self.closest_max(current_pos)
 
         min_pos = current_pos
         min_dist = sys.maxsize
