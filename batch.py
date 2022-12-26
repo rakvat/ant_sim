@@ -7,11 +7,11 @@ from sim.model import SugarscapeCg
 
 # parameter lists for each parameter to be tested in batch run
 model_params = {
-    "initial_population": [500, 1000],
-    "recreate": [10],
+    "initial_population": [100, 500],
+    "recreate": [0, 10],
     "shared_knowledge": [False, True],
     "solidarity": [False, True],
-    "individualist_percent": [0, 1, 10, 50, 100],
+    "individualist_percent": [0, 1, 10, 50, 90],
 }
 
 fixed_parameters = {}

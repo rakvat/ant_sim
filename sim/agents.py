@@ -34,8 +34,7 @@ class Ant(Agent):
         self.individualist = individualist
 
     def get_sugar(self, pos):
-        this_cell = self.model.grid.get_cell_list_contents([pos])
-        for agent in this_cell:
+        for agent in self.model.grid[pos]:
             if type(agent) is Sugar:
                 return agent
 
@@ -59,7 +58,6 @@ class Ant(Agent):
             candidates=candidates,
         )
         sugar_at_new_pos = self.get_sugar(new_pos).amount
-        self.model.shared_knowledge.publish_value(new_pos, sugar_at_new_pos)
         self.model.grid.move_agent(self, new_pos)
 
     def unoccupied_neighbors(self):

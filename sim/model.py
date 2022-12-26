@@ -48,12 +48,12 @@ class SugarscapeCg(Model):
         self.recreate = recreate
 
         self.schedule = RandomActivationByBreed(self)
-        self.shared_knowledge = SharedKnowledge(width=width, height=height) if shared_knowledge else None
         self.distribution = Distribution() if solidarity else None
         self.solidarity = solidarity
         self.individualist_percent = individualist_percent if self.solidarity else 0
 
         self.grid = MultiGrid(self.height, self.width, torus=False)
+        self.shared_knowledge = SharedKnowledge(self.grid) if shared_knowledge else None
         self.datacollector = DataCollector({
             "initial_population": lambda m: m.initial_population,
             "shared_knowledge": lambda m: m.shared_knowledge is not None,
@@ -119,6 +119,9 @@ class SugarscapeCg(Model):
                 self._create_ant()
 
         self.schedule.step()
+
+        if self.shared_knowledge:
+            self.shared_knowledge.update()
 
         # collect data
         self.datacollector.collect(self)
