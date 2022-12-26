@@ -55,7 +55,7 @@ class SharedKnowledge:
             return pos
         return self._closest(pos, pos_with_max)
 
-    def in_direction_to_closest(self, current_pos: POS, candidates: List[POS]) -> POS:
+    def in_direction_to_closest_max(self, current_pos: POS, candidates: List[POS]) -> POS:
         closest = self.closest_max(current_pos)
 
         min_pos = current_pos

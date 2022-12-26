@@ -41,7 +41,7 @@ class Ant(Agent):
 
     def move(self):
         neighbors = self.unoccupied_neighbors()
-        candidates = self.sugar_candidates(neighbors or [self.pos])
+        candidates = self.max_sugar_candidates(neighbors or [self.pos])
         # Narrow down to the nearest ones
         min_dist = min([get_distance(self.pos, pos) for pos in candidates])
         final_candidates = [
@@ -52,9 +52,9 @@ class Ant(Agent):
 
     def move_with_shared_knowledge(self):
         neighbors = self.unoccupied_neighbors()
-        candidates = self.sugar_candidates(neighbors or [self.pos])
+        candidates = self.max_sugar_candidates(neighbors or [self.pos])
 
-        new_pos = self.model.shared_knowledge.in_direction_to_closest(
+        new_pos = self.model.shared_knowledge.in_direction_to_closest_max(
             current_pos=self.pos,
             candidates=candidates,
         )
@@ -71,7 +71,7 @@ class Ant(Agent):
             if not self.model.is_occupied(i)
         ]
 
-    def sugar_candidates(self, possible_pos):
+    def max_sugar_candidates(self, possible_pos):
         max_value = max([self.get_sugar(pos).amount for pos in possible_pos])
         return [pos for pos in possible_pos if self.get_sugar(pos).amount == max_value]
 
