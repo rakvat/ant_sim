@@ -110,18 +110,18 @@ class SugarscapeCg(Model):
         self.schedule.add(ant)
 
     def is_occupied(self, pos):
-        this_cell = self.grid.get_cell_list_contents([pos])
+        this_cell = self.grid[pos]
         return len(this_cell) > 1
 
     def step(self):
+        if self.recreate and self.schedule.time % 10 == 0:
+            for _ in range(0, self.recreate):
+                self._create_ant()
+
         self.schedule.step()
 
         # collect data
         self.datacollector.collect(self)
-
-        if self.recreate and self.schedule.time % 10 == 0:
-            for _ in range(0, self.recreate):
-                self._create_ant()
 
         if self.verbose:
             print({

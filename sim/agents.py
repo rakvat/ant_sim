@@ -109,6 +109,7 @@ class Ant(Agent):
 class Sugar(Agent):
     def __init__(self, pos, model, max_sugar):
         super().__init__(pos, model)
+        self.id = pos
         self.amount = max_sugar
         self.max_sugar = max_sugar
 

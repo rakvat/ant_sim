@@ -6,7 +6,7 @@ from mesa.visualization.UserParam import Checkbox, Slider
 from .agents import Ant, Sugar
 from .model import SugarscapeCg
 
-color_dic = {4: "#005C00", 3: "#008300", 2: "#00AA00", 1: "#00F800", 0: "#D6F5D6"}
+sugar_color_dic = {4: "#005C00", 3: "#008300", 2: "#00AA00", 1: "#00F800", 0: "#D6F5D6"}
 
 
 # number needs to be between 0 and 1.0
@@ -14,7 +14,7 @@ def float2hex(number:float) -> str:
     value = int(max(min(number, 1.0), 0.0)*255)
     return f"{value:0{2}x}"
 
-def ant_portrayal(agent):
+def actor_portrayal(agent):
     if agent is None:
         return
 
@@ -32,7 +32,7 @@ def ant_portrayal(agent):
         portrayal["id/sugar/meta/vis"] = f"{agent.id}/{agent.sugar}/{agent.metabolism}/{agent.senses}"
 
     elif type(agent) is Sugar:
-        portrayal["Color"] = color_dic[agent.amount]
+        portrayal["Color"] = sugar_color_dic[agent.amount]
         portrayal["Shape"] = "rect"
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 0
@@ -42,7 +42,7 @@ def ant_portrayal(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(ant_portrayal, 50, 50, 500, 500)
+canvas_element = CanvasGrid(actor_portrayal, 50, 50, 500, 500)
 alive_chart_element = ChartModule([
     {"Label": SugarscapeCg.LIVING_ANTS, "Color": "#00AA00"},
     {"Label": SugarscapeCg.DEAD_ANTS, "Color": "#AA0000"}

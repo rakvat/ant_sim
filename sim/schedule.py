@@ -6,7 +6,7 @@ from mesa.time import RandomActivation
 
 from .agents import Ant
 
-LOW_SENSES_THRESHOLD = 3
+LOW_SENSES_THRESHOLD = 3  # below this value is considerd low, should be 50% of randrange(1, 5)
 
 
 class RandomActivationByBreed(RandomActivation):
@@ -23,6 +23,7 @@ class RandomActivationByBreed(RandomActivation):
     def __init__(self, model):
         super().__init__(model)
         self.agents_by_breed = defaultdict(dict)
+        self._agents = {}
         self.num_dead = 0
         self.num_low_senses_dead = 0
         self.num_high_senses_dead = 0
@@ -36,9 +37,9 @@ class RandomActivationByBreed(RandomActivation):
             agent: An Agent to be added to the schedule.
         """
 
-        self._agents[agent.unique_id] = agent
+        self._agents[agent.id] = agent
         agent_class = type(agent)
-        self.agents_by_breed[agent_class][agent.unique_id] = agent
+        self.agents_by_breed[agent_class][agent.id] = agent
 
     def remove(self, agent):
         """
@@ -53,10 +54,10 @@ class RandomActivationByBreed(RandomActivation):
         if agent.individualist:
             self.num_individualists_dead += 1
 
-        del self._agents[agent.unique_id]
+        del self._agents[agent.id]
 
         agent_class = type(agent)
-        del self.agents_by_breed[agent_class][agent.unique_id]
+        del self.agents_by_breed[agent_class][agent.id]
 
     def step(self, by_breed=True):
         """
@@ -96,16 +97,24 @@ class RandomActivationByBreed(RandomActivation):
         return self.agents_by_breed[Ant].values()
 
     def min_sugar(self) -> float:
-        return min(a.sugar for a in self.get_ants())
+        if (len(ants:=self.get_ants()) <= 0):
+            return 0
+        return min(a.sugar for a in ants)
 
     def max_sugar(self) -> float:
-        return max(a.sugar for a in self.get_ants())
+        if (len(ants:=self.get_ants()) <= 0):
+            return 0
+        return max(a.sugar for a in ants)
 
     def avg_sugar(self) -> float:
-        return mean(a.sugar for a in self.get_ants())
+        if (len(ants:=self.get_ants()) <= 0):
+            return 0
+        return mean(a.sugar for a in ants)
 
     def stdev_sugar(self) -> float:
-        return stdev(a.sugar for a in self.get_ants())
+        if (len(ants:=self.get_ants()) <= 1):
+            return 0
+        return stdev(a.sugar for a in ants)
 
     def percent_dead(self, filter: Optional[str] = None) -> float:
         if self.num_dead == 0:
