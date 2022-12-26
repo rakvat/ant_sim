@@ -9,7 +9,9 @@ from .agents import Sugar
 POS = tuple[int, int]
 
 
-class SharedKnowledge:
+class Internet:
+    """ Recently available sugar data and distances to good sugar areas available for all agents. """
+
     distance_map: dict[POS, float] = {}
     recent_sugar_map: dict[POS, int] = {}
     current_max = 0
@@ -27,7 +29,6 @@ class SharedKnowledge:
     def update(self) -> None:
         for _, x, y in self.grid.coord_iter():
             self.recent_sugar_map[(x, y)] = round(self.recent_sugar_map[(x,y)] * 0.5 + 0.5 * self._sugar_at((x, y)))
-        print(self.recent_sugar_map)
 
     def recent_max(self) -> int:
         if not self.recent_sugar_map:

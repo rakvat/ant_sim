@@ -16,7 +16,7 @@ from mesa.datacollection import DataCollector
 
 from .agents import Ant, Sugar
 from .schedule import RandomActivationByBreed
-from .shared_knowledge import SharedKnowledge
+from .internet import Internet
 from .distribution import Distribution
 
 
@@ -33,7 +33,7 @@ class SugarscapeCg(Model):
 
     verbose = True  # Print-monitoring
 
-    def __init__(self, height=50, width=50, initial_population=100, recreate=0, shared_knowledge=False, solidarity=False, individualist_percent=0):
+    def __init__(self, height=50, width=50, initial_population=100, recreate=0, internet=False, solidarity=False, individualist_percent=0):
         """
         Create a new Constant Growback model with the given parameters.
 
@@ -53,10 +53,10 @@ class SugarscapeCg(Model):
         self.individualist_percent = individualist_percent if self.solidarity else 0
 
         self.grid = MultiGrid(self.height, self.width, torus=False)
-        self.shared_knowledge = SharedKnowledge(self.grid) if shared_knowledge else None
+        self.internet = Internet(self.grid) if internet else None
         self.datacollector = DataCollector({
             "initial_population": lambda m: m.initial_population,
-            "shared_knowledge": lambda m: m.shared_knowledge is not None,
+            "internet": lambda m: m.internet is not None,
             "recreate": lambda m: m.recreate,
             "solidarity": lambda m: m.solidarity,
             "individualist_percent": lambda m: m.individualist_percent,
@@ -120,8 +120,8 @@ class SugarscapeCg(Model):
 
         self.schedule.step()
 
-        if self.shared_knowledge:
-            self.shared_knowledge.update()
+        if self.internet:
+            self.internet.update()
 
         # collect data
         self.datacollector.collect(self)

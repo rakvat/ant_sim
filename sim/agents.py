@@ -49,11 +49,11 @@ class Ant(Agent):
         self.random.shuffle(final_candidates)
         self.model.grid.move_agent(self, final_candidates[0])
 
-    def move_with_shared_knowledge(self):
+    def move_with_internet(self):
         neighbors = self.unoccupied_neighbors()
         candidates = self.max_sugar_candidates(neighbors or [self.pos])
 
-        new_pos = self.model.shared_knowledge.in_direction_to_closest_max(
+        new_pos = self.model.internet.in_direction_to_closest_max(
             current_pos=self.pos,
             candidates=candidates,
         )
@@ -84,8 +84,8 @@ class Ant(Agent):
         self.sugar = self.sugar - self.metabolism + amount
 
     def step(self):
-        if self.model.shared_knowledge:
-            self.move_with_shared_knowledge()
+        if self.model.internet:
+            self.move_with_internet()
         else:
             self.move()
         collected = self.collect()

@@ -56,7 +56,7 @@ senses_chart_element = ChartModule([
 model_params = {
     "initial_population": Slider("Initial Population", value=100, min_value=2, max_value=2000, step=1),
     "recreate": Slider("Recreate ants every 10 steps", value=0, min_value=0, max_value=10, step=1),
-    "shared_knowledge": Checkbox("Shared Knowledge", False),
+    "internet": Checkbox("Internet", False),
     "solidarity": Checkbox("Solidarity", False),
     "individualist_percent": Slider("Percent individualists", value=0, min_value=0, max_value=100, step=1, description="only with solidarity"),
 }

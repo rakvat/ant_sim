@@ -9,7 +9,7 @@ from sim.model import SugarscapeCg
 model_params = {
     "initial_population": [100, 500],
     "recreate": [0, 10],
-    "shared_knowledge": [False, True],
+    "internet": [False, True],
     "solidarity": [False, True],
     "individualist_percent": [0, 1, 10, 50, 90],
 }
