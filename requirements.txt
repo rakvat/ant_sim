@@ -2,4 +2,5 @@ mesa
 jupyter
 numpy
 matplotlib
+plotly
 pandas
