@@ -1,6 +1,7 @@
-mesa
-jupyter
-numpy
-matplotlib
-plotly
-pandas
+mesa   # ABM
+jupyter  # notebook
+numpy  # data
+pandas  # data
+matplotlib  # plots
+plotly  # polots
+kaleido  # pots as images
