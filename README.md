@@ -1,3 +1,5 @@
+These simulation experimets were done as part of the article [Tools for Emancipatory Societies](https://transform-social.org/texte/tools/).
+
 # Simulation Experiments
 
 This simulation is using [mesa](https://mesa.readthedocs.io/en/stable/).
